@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>さんすうドットつなぎ</title>
   <style>
     * {
@@ -16,55 +16,48 @@
     html, body {
       width: 100%;
       height: 100%;
+      margin: 0;
+      padding: 0;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: #f8fafc;
       display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    /* 基準となる固定サイズのコンテナ（この中でレイアウトを完結させ、自動縮小します） */
-    #app-wrapper {
-      width: 800px;
-      height: 550px;
-      background-color: #f8fafc;
-      display: flex;
       flex-direction: column;
-      position: absolute;
-      transform-origin: center center;
-      overflow: hidden;
     }
     header {
       background-color: #ffffff;
       border-bottom: 2px solid #e2e8f0;
-      padding: 10px 16px;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 6px;
+      flex-wrap: nowrap;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       flex-shrink: 0;
-      height: 70px;
+      width: 100%;
     }
     .tool-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
+      flex-shrink: 0;
     }
     .btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 8px 14px;
-      font-size: 15px;
+      gap: 4px;
+      padding: 6px 10px;
+      font-size: 13px;
       font-weight: bold;
       border: 2px solid #cbd5e1;
-      border-radius: 10px;
+      border-radius: 8px;
       background-color: #ffffff;
       color: #334155;
       cursor: pointer;
       touch-action: manipulation;
+      white-space: nowrap;
     }
     .btn:active {
       transform: scale(0.96);
@@ -78,22 +71,23 @@
     .size-control {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 2px;
       background-color: #f1f5f9;
-      padding: 4px 8px;
-      border-radius: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
       font-weight: bold;
       color: #475569;
-      font-size: 14px;
+      font-size: 12px;
+      white-space: nowrap;
     }
     .num-btn {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
       border-radius: 6px;
       border: 1px solid #cbd5e1;
       background-color: #ffffff;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 13px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -104,73 +98,77 @@
       background-color: #e2e8f0;
     }
     .val-display {
-      min-width: 20px;
+      min-width: 18px;
       text-align: center;
     }
     #msg-bar {
-      font-size: 15px;
+      font-size: 13px;
       font-weight: bold;
       color: #2563eb;
       background-color: #dbeafe;
-      padding: 6px 14px;
-      border-radius: 14px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      text-align: center;
     }
     main {
       flex: 1;
       width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
       overflow: hidden;
+      padding: 6px;
+      position: relative;
     }
     canvas {
       display: block;
       touch-action: none;
       background-color: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
   </style>
 </head>
 <body>
 
-  <div id="app-wrapper">
-    <header>
-      <div class="tool-group">
-        <button id="btn-pen" class="btn active"><span>🖊️</span> ペン</button>
-        <button id="btn-eraser" class="btn"><span>🧹</span> けしごむ</button>
+  <header>
+    <div class="tool-group">
+      <button id="btn-pen" class="btn active"><span>🖊️</span> ペン</button>
+      <button id="btn-eraser" class="btn"><span>🧹</span> けしごむ</button>
+    </div>
+
+    <div id="msg-bar">ドットを1つえらんでね</div>
+
+    <div class="tool-group">
+      <div class="size-control">
+        <span>たて</span>
+        <button class="num-btn" id="rows-down">▼</button>
+        <span class="val-display" id="rows-val">8</span>
+        <button class="num-btn" id="rows-up">▲</button>
       </div>
 
-      <div id="msg-bar">ドットを1つえらんでね</div>
-
-      <div class="tool-group">
-        <div class="size-control">
-          <span>たて</span>
-          <button class="num-btn" id="rows-down">▼</button>
-          <span class="val-display" id="rows-val">8</span>
-          <button class="num-btn" id="rows-up">▲</button>
-        </div>
-
-        <div class="size-control">
-          <span>よこ</span>
-          <button class="num-btn" id="cols-down">▼</button>
-          <span class="val-display" id="cols-val">10</span>
-          <button class="num-btn" id="cols-up">▲</button>
-        </div>
-
-        <button id="btn-undo" class="btn">↩️ もどす</button>
-        <button id="btn-clear" class="btn">🗑️ リセット</button>
+      <div class="size-control">
+        <span>よこ</span>
+        <button class="num-btn" id="cols-down">▼</button>
+        <span class="val-display" id="cols-val">10</span>
+        <button class="num-btn" id="cols-up">▲</button>
       </div>
-    </header>
 
-    <main id="mainArea">
-      <canvas id="gridCanvas" width="720" height="420"></canvas>
-    </main>
-  </div>
+      <button id="btn-undo" class="btn">↩️ もどす</button>
+      <button id="btn-clear" class="btn">🗑️ リセット</button>
+    </div>
+  </header>
+
+  <main id="mainArea">
+    <canvas id="gridCanvas"></canvas>
+  </main>
 
   <script>
-    const wrapper = document.getElementById('app-wrapper');
     const canvas = document.getElementById('gridCanvas');
     const ctx = canvas.getContext('2d');
     const mainArea = document.getElementById('mainArea');
@@ -199,30 +197,14 @@
 
     let gridOffset = { x: 0, y: 0 };
     let gridSpacing = 0;
-    let dotRadius = 10;
-
-    // 画面全体にフィットさせるための自動スケーリング計算
-    function autoScale() {
-      const targetWidth = 800;
-      const targetHeight = 550;
-
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-
-      const scaleX = windowWidth / targetWidth;
-      const scaleY = windowHeight / targetHeight;
-      const scale = Math.min(scaleX, scaleY, 1.0); // 拡大はせず、収まらない時だけ縮小
-
-      wrapper.style.transform = `scale(${scale})`;
-      wrapper.style.left = `${(windowWidth - targetWidth) / 2}px`;
-      wrapper.style.top = `${(windowHeight - targetHeight) / 2}px`;
-    }
+    let dotRadius = 0;
 
     function resizeCanvas() {
+      // 親容器（mainArea）の実際の表示領域を直接計測
       const rect = mainArea.getBoundingClientRect();
-      const padding = 20;
-      const availWidth = rect.width - padding * 2;
-      const availHeight = rect.height - padding * 2;
+      const padding = 8;
+      const availWidth = Math.max(50, rect.width - padding * 2);
+      const availHeight = Math.max(50, rect.height - padding * 2);
 
       const maxColSpan = cols - 1;
       const maxRowSpan = rows - 1;
@@ -240,7 +222,7 @@
       gridOffset.x = (canvas.width - gridWidth) / 2;
       gridOffset.y = (canvas.height - gridHeight) / 2;
 
-      dotRadius = Math.max(6, Math.min(gridSpacing * 0.12, 12));
+      dotRadius = Math.max(4, Math.min(gridSpacing * 0.12, 10));
 
       draw();
     }
@@ -264,7 +246,7 @@
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
         ctx.strokeStyle = isHovered ? HOVER_LINE_COLOR : LINE_COLOR;
-        ctx.lineWidth = isHovered ? 6 : 4;
+        ctx.lineWidth = isHovered ? 5 : 3.5;
         ctx.lineCap = 'round';
         ctx.stroke();
       });
@@ -282,7 +264,7 @@
           ctx.beginPath();
           ctx.arc(pos.x, pos.y, dotRadius, 0, Math.PI * 2);
           ctx.strokeStyle = isSelected ? '#b91c1c' : '#0284c7';
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 1.2;
           ctx.stroke();
         }
       }
@@ -299,17 +281,15 @@
       const rect = canvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      // スケールされたサイズに対する補正
-      const scale = canvas.width / rect.width;
       return {
-        x: (clientX - rect.left) * scale,
-        y: (clientY - rect.top) * scale
+        x: clientX - rect.left,
+        y: clientY - rect.top
       };
     }
 
     function findClosestDot(pos) {
       let closest = null;
-      let minDistance = dotRadius * 3;
+      let minDistance = Math.max(dotRadius * 3, 20);
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -326,7 +306,7 @@
 
     function findClosestLine(pos) {
       let closest = null;
-      let minDistance = 24;
+      let minDistance = 20;
 
       lines.forEach(line => {
         const p1 = getDotPos(line.p1.r, line.p1.c);
@@ -430,17 +410,14 @@
       resizeCanvas();
     }
 
-    function init() {
-      autoScale();
-      resizeCanvas();
-    }
-
-    window.addEventListener('resize', () => {
-      autoScale();
+    // Googleサイトの埋め込み枠リサイズを常時監視
+    const resizeObserver = new ResizeObserver(() => {
       resizeCanvas();
     });
-    window.addEventListener('load', init);
-    setTimeout(init, 100);
+    resizeObserver.observe(mainArea);
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', resizeCanvas);
   </script>
 </body>
 </html>
