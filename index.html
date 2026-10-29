@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>さんすうドットつなぎ</title>
   <style>
     * {
@@ -17,15 +17,10 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Hiragino Kaku Gothic ProN, Sans-Serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: #f8fafc;
       display: flex;
       flex-direction: column;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
     }
     header {
       background-color: #ffffff;
@@ -37,8 +32,8 @@
       gap: 8px;
       flex-wrap: wrap;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      z-index: 10;
       flex-shrink: 0;
+      z-index: 10;
     }
     .tool-group {
       display: flex;
@@ -50,15 +45,14 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      padding: 6px 10px;
+      padding: 6px 12px;
       font-size: 14px;
       font-weight: bold;
       border: 2px solid #cbd5e1;
-      border-radius: 10px;
+      border-radius: 8px;
       background-color: #ffffff;
       color: #334155;
       cursor: pointer;
-      transition: all 0.15s ease;
       touch-action: manipulation;
     }
     .btn:active {
@@ -73,17 +67,17 @@
     .size-control {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
       background-color: #f1f5f9;
       padding: 2px 6px;
-      border-radius: 10px;
+      border-radius: 8px;
       font-weight: bold;
       color: #475569;
       font-size: 13px;
     }
     .num-btn {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 6px;
       border: 1px solid #cbd5e1;
       background-color: #ffffff;
@@ -103,32 +97,29 @@
       text-align: center;
     }
     #msg-bar {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
       color: #2563eb;
       background-color: #dbeafe;
       padding: 4px 10px;
-      border-radius: 16px;
-      text-align: center;
-      white-space: nowrap;
+      border-radius: 12px;
     }
     main {
       flex: 1;
-      position: relative;
       width: 100%;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px;
       overflow: hidden;
+      padding: 10px;
     }
     canvas {
       display: block;
       touch-action: none;
       background-color: #ffffff;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
   </style>
 </head>
@@ -136,12 +127,8 @@
 
   <header>
     <div class="tool-group">
-      <button id="btn-pen" class="btn active">
-        <span>🖊️</span> ペン
-      </button>
-      <button id="btn-eraser" class="btn">
-        <span>🧹</span> けしごむ
-      </button>
+      <button id="btn-pen" class="btn active"><span>🖊️</span> ペン</button>
+      <button id="btn-eraser" class="btn"><span>🧹</span> けしごむ</button>
     </div>
 
     <div id="msg-bar">ドットを1つえらんでね</div>
@@ -161,19 +148,19 @@
         <button class="num-btn" id="cols-up">▲</button>
       </div>
 
-      <button id="btn-undo" class="btn" title="ひとつもどす">↩️ もどす</button>
-      <button id="btn-clear" class="btn" title="ぜんぶけす">🗑️ リセット</button>
+      <button id="btn-undo" class="btn">↩️ もどす</button>
+      <button id="btn-clear" class="btn">🗑️ リセット</button>
     </div>
   </header>
 
-  <main id="container">
+  <main id="mainArea">
     <canvas id="gridCanvas"></canvas>
   </main>
 
   <script>
     const canvas = document.getElementById('gridCanvas');
     const ctx = canvas.getContext('2d');
-    const container = document.getElementById('container');
+    const mainArea = document.getElementById('mainArea');
     const msgBar = document.getElementById('msg-bar');
 
     const btnPen = document.getElementById('btn-pen');
@@ -186,7 +173,7 @@
 
     let rows = 8;
     let cols = 10;
-    let mode = 'pen'; // 'pen' | 'eraser'
+    let mode = 'pen';
 
     let selectedDot = null;
     let hoverLine = null;
@@ -202,8 +189,8 @@
     let dotRadius = 0;
 
     function resizeCanvas() {
-      const rect = container.getBoundingClientRect();
-      const padding = 12;
+      const rect = mainArea.getBoundingClientRect();
+      const padding = 16;
       const availWidth = Math.max(100, rect.width - padding * 2);
       const availHeight = Math.max(100, rect.height - padding * 2);
 
@@ -223,7 +210,7 @@
       gridOffset.x = (canvas.width - gridWidth) / 2;
       gridOffset.y = (canvas.height - gridHeight) / 2;
 
-      dotRadius = Math.max(5, Math.min(gridSpacing * 0.12, 10));
+      dotRadius = Math.max(6, Math.min(gridSpacing * 0.12, 11));
 
       draw();
     }
@@ -241,14 +228,13 @@
       lines.forEach(line => {
         const p1 = getDotPos(line.p1.r, line.p1.c);
         const p2 = getDotPos(line.p2.r, line.p2.c);
-
         const isHovered = mode === 'eraser' && hoverLine && isSameLine(line, hoverLine);
 
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
         ctx.strokeStyle = isHovered ? HOVER_LINE_COLOR : LINE_COLOR;
-        ctx.lineWidth = isHovered ? 5 : 3.5;
+        ctx.lineWidth = isHovered ? 6 : 4;
         ctx.lineCap = 'round';
         ctx.stroke();
       });
@@ -266,7 +252,7 @@
           ctx.beginPath();
           ctx.arc(pos.x, pos.y, dotRadius, 0, Math.PI * 2);
           ctx.strokeStyle = isSelected ? '#b91c1c' : '#0284c7';
-          ctx.lineWidth = 1.2;
+          ctx.lineWidth = 1.5;
           ctx.stroke();
         }
       }
@@ -275,16 +261,17 @@
     function isSameLine(l1, l2) {
       return (
         (l1.p1.r === l2.p1.r && l1.p1.c === l2.p1.c && l1.p2.r === l2.p2.r && l1.p2.c === l2.p2.c) ||
-        (l1.p1.r === l2.p2.r && l1.p1.c === l2.p2.c && l1.p2.r === l2.p1.r && l1.p2.c === l2.p1.c)
+        (l1.p1.r === l2.p2.r && l1.p1.c === l2.p2.c && l1.p2.r === l1.p1.r && l1.p2.c === l2.p1.c)
       );
     }
 
     function getEventPos(e) {
       const rect = canvas.getBoundingClientRect();
-      const touch = e.touches ? e.touches[0] : (e.changedTouches ? e.changedTouches[0] : e);
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       return {
-        x: touch.clientX - rect.left,
-        y: touch.clientY - rect.top
+        x: clientX - rect.left,
+        y: clientY - rect.top
       };
     }
 
@@ -312,7 +299,6 @@
       lines.forEach(line => {
         const p1 = getDotPos(line.p1.r, line.p1.c);
         const p2 = getDotPos(line.p2.r, line.p2.c);
-
         const dist = distToSegment(pos, p1, p2);
         if (dist < minDistance) {
           minDistance = dist;
@@ -330,9 +316,8 @@
       return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
     }
 
-    function handlePointerDown(e) {
+    function handleAction(e) {
       const pos = getEventPos(e);
-
       if (mode === 'pen') {
         const dot = findClosestDot(pos);
         if (!dot) return;
@@ -360,35 +345,17 @@
       draw();
     }
 
-    function handlePointerMove(e) {
-      if (mode === 'eraser') {
-        const pos = getEventPos(e);
-        const closest = findClosestLine(pos);
-        if (closest !== hoverLine) {
-          hoverLine = closest;
-          draw();
-        }
-      }
-    }
-
+    canvas.addEventListener('click', handleAction);
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      handlePointerDown(e);
+      handleAction(e);
     }, { passive: false });
 
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      handlePointerMove(e);
-    }, { passive: false });
-
-    canvas.addEventListener('mousedown', handlePointerDown);
-    canvas.addEventListener('mousemove', handlePointerMove);
-
+    // モード切替等
     btnPen.addEventListener('click', () => {
       mode = 'pen';
       btnPen.classList.add('active');
       btnEraser.classList.remove('active');
-      hoverLine = null;
       msgBar.textContent = 'ドットを1つえらんでね';
       draw();
     });
@@ -419,41 +386,22 @@
       draw();
     });
 
-    document.getElementById('rows-up').addEventListener('click', () => {
-      if (rows < 15) { rows++; updateGridSize(); }
-    });
-    document.getElementById('rows-down').addEventListener('click', () => {
-      if (rows > 3) { rows--; updateGridSize(); }
-    });
-    document.getElementById('cols-up').addEventListener('click', () => {
-      if (cols < 15) { cols++; updateGridSize(); }
-    });
-    document.getElementById('cols-down').addEventListener('click', () => {
-      if (cols > 3) { cols--; updateGridSize(); }
-    });
+    document.getElementById('rows-up').addEventListener('click', () => { if (rows < 15) { rows++; updateGridSize(); } });
+    document.getElementById('rows-down').addEventListener('click', () => { if (rows > 3) { rows--; updateGridSize(); } });
+    document.getElementById('cols-up').addEventListener('click', () => { if (cols < 15) { cols++; updateGridSize(); } });
+    document.getElementById('cols-down').addEventListener('click', () => { if (cols > 3) { cols--; updateGridSize(); } });
 
     function updateGridSize() {
       rowsVal.textContent = rows;
       colsVal.textContent = cols;
       lines = lines.filter(l => l.p1.r < rows && l.p2.r < rows && l.p1.c < cols && l.p2.c < cols);
-      if (selectedDot && (selectedDot.r >= rows || selectedDot.c >= cols)) {
-        selectedDot = null;
-      }
+      if (selectedDot && (selectedDot.r >= rows || selectedDot.c >= cols)) selectedDot = null;
       resizeCanvas();
     }
 
-    const resizeObserver = new ResizeObserver(() => {
-      resizeCanvas();
-    });
-    resizeObserver.observe(container);
-
     window.addEventListener('resize', resizeCanvas);
     window.addEventListener('load', resizeCanvas);
-    document.addEventListener('touchmove', (e) => {
-      if (e.target.tagName === 'CANVAS') {
-        e.preventDefault();
-      }
-    }, { passive: false });
+    setTimeout(resizeCanvas, 100);
   </script>
 </body>
 </html>
